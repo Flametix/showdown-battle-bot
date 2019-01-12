@@ -8,8 +8,8 @@ from src.battle import Battle
 import random
 
 battles = []
-nb_fights_max = 1 #Maximum fights that can be searched at the same time - leave at 1 for easy closing
-nb_fights_simu_max = 1 #Something for ai
+nb_fights_max = 5 #Maximum fights that can be done in 1 session. Exits when reached
+nb_fights_simu_max = 2 #Maximum simultaneous fights, I think showdown already caps this at 2
 nb_fights = 0
 
 formats = [
@@ -115,13 +115,8 @@ async def battle_tag(websocket, message, usage):
                         if split_line[0] == "faint":
                             await senders.sendmessage(websocket, battle.battletag, "rip")
                             battleturn = battle.turn #1 massage per turn - Flame
-                        elif split_line[0] == "-crit":
-                            if battle.player_id in split_line[1]:
-                                await senders.sendmessage(websocket, battle.battletag, random.choice(good))
-                            else:
-                                await senders.sendmessage(websocket, battle.battletag, random.choice(bad))
-                            battleturn = battle.turn #1 massage per turn - Flame
-                        elif split_line[0] == "-supereffective":
+
+                        elif split_line[0] == "-supereffective" or split_line[0] == "-crit":
                             if battle.player_id in split_line[1]:
                                 await senders.sendmessage(websocket, battle.battletag, random.choice(bad))
                             else:
@@ -151,6 +146,10 @@ async def stringing(websocket, message, usage=2):
     global nb_fights_simu_max
     global battles
     global formats
+    search = False #tracking this because PS does not let you search twice for the same format
+    # because of this sometimes u can make searches that dont go through and play less games
+    
+
 
     string_tab = message.split('|')
     if string_tab[1] == "challstr":
@@ -168,17 +167,21 @@ async def stringing(websocket, message, usage=2):
     elif string_tab[1] == "deinit" and usage == 2:
         # If previous fight is over and we're in 2nd usage
         if nb_fights < nb_fights_max:  # If it remains fights
-            await senders.sender(websocket, "", "/utm " + team)                        
-
-            await senders.searching(websocket, formats[0])
+            if search == False:
+                await senders.sender(websocket, "", "/utm " + team)                        
+    
+                await senders.searching(websocket, formats[0])
+                search = True
             nb_fights += 1
-        elif nb_fights >= nb_fights_max and len(battles) == 0:  # If it don't remains fights
+        elif nb_fights >= nb_fights_max and len(battles) == 0:  # If it don't remains fights (Fights reached max limit)
             exit(0)
-    elif "|inactive|Battle timer is ON:" in message and usage == 2:
+    elif "|inactive|Battle timer is ON:" in message and usage == 2 and "savereplay" not in message:
         # If previous fight has started and we can do more simultaneous fights and we're in 2nd usage.
         if len(battles) < nb_fights_simu_max and nb_fights < nb_fights_max:
-            await senders.sender(websocket, "", "/utm " + team)                        
-            await senders.searching(websocket, formats[0])
+            if search == False:
+                search = True
+                await senders.sender(websocket, "", "/utm " + team)                        
+                await senders.searching(websocket, formats[0])
             nb_fights += 1
     elif "updatechallenges" in string_tab[1]:
         # If somebody challenges the bot
@@ -205,4 +208,5 @@ async def stringing(websocket, message, usage=2):
 
     if "battle" in string_tab[0]:
         # Battle concern message.
+        search = False #battle start! can search another?
         await battle_tag(websocket, message, usage)
