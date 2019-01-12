@@ -15,7 +15,7 @@ Socket (Metronome) battle bot for the pokemon simulator [Pokemon Showdown](http:
 
 ### Installation
 ```
-pip3 install -r requirements.txt
+pip3 install -r requirement.txt
 ./main 
 ```
 future me: run the main file
