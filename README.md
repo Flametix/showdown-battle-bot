@@ -16,8 +16,9 @@ Socket (Metronome) battle bot for the pokemon simulator [Pokemon Showdown](http:
 ### Installation
 ```
 pip3 install -r requirements.txt
-./main
+./main 
 ```
+future me: run the main file
 
 ### How does that works
 The bot works in three parts : I/O process, game engine and """AI""".
@@ -32,6 +33,8 @@ In the answer, you have to extract the `assertion` part.
 Finally, you have to send a websrequest this format : `/trn <USERNAME>,0,<ASSERTION>` where `<USERNAME>` is the one you gave previously and `<ASSERTION>` the one you extract just before.
 For more informations about it, check the [login.py](src/login.py) file.
 
+(IO process is pretty important, I agree)
+
 Game engine is about simulate battles, teams and pokemons. 
 For each battle, an object is created and filled with informations sent by Showdown's servers. 
 For the unkowns informations (enemy's team), moves are filled thanks to a file take from source code where moves and pokemons are listed.
@@ -40,4 +43,5 @@ See [data](data/) forlder for more informations.
 (The engine is cool and very involved with the AI but for metronome purposes we don't use it.)
 
 Bot's brain, the AI:
-I forked this bot and destroyed its ai. Whenever it makes a move it says "/choose default". This lets it play doubles when it couldn't before.
+
+(I forked this bot and destroyed its ai. Whenever it makes a move it says "/choose default". This lets it play doubles when it couldn't before.)
