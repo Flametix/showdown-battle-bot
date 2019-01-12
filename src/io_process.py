@@ -8,8 +8,8 @@ from src.battle import Battle
 import random
 
 battles = []
-nb_fights_max = 5 #Maximum fights that can be done in 1 session. Exits when reached
-nb_fights_simu_max = 2 #Maximum simultaneous fights, I think showdown already caps this at 2
+nb_fights_max = 10 #Maximum fights that can be done in 1 session. Exits when reached
+nb_fights_simu_max = 2 #Maximum simultaneous fights, I think showdown already caps this at 2 (searches)
 nb_fights = 0
 
 formats = [
@@ -47,8 +47,8 @@ async def battle_tag(websocket, message, usage):
     global battles
     battleturn = -1   
     currentturn = 1
-    good = ["not even close baby", "yes", "ez", "this is epic", "gg", "nice"] #good lines in general (se move, crit)
-    bad = ["gameshark", "powersaves", "calling nintendo on you rn", "hax", "no", "damn", "action replay", "sheesh", "eh"]
+    good = ["not even close baby", "yes", "ez", "this is epic", "gg", "nice", "outplayed"] #good lines in general (se move, crit)
+    bad = ["gameshark", "powersaves", "calling nintendo on you rn", "hax", "no", "damn", "action replay", "sheesh", "unfortunate", "Sad!"]
     responses = ["faint", "-crit", "-supereffective"]
     lines = message.splitlines()
     battle = check_battle(battles, lines[0].split("|")[0].split(">")[1])
@@ -86,8 +86,9 @@ async def battle_tag(websocket, message, usage):
             elif current[1] == "callback" and current[2] == "trapped":
                 await battle.make_move(websocket)
             elif current[1] == "win":
+                
                 await senders.sendmessage(websocket, battle.battletag, "Good game!") #friendly
-                await senders.savereplay(websocket, battle.battletag)                
+                #await senders.savereplay(websocket, battle.battletag)                
                 await senders.leaving(websocket, battle.battletag)
                 battles.remove(battle)
                 if usage == 2:
@@ -161,7 +162,7 @@ async def stringing(websocket, message, usage=2):
             await senders.challenge(websocket, "Flametix", formats[0])
         if usage == 2:
             await senders.sender(websocket, "", "/utm " + team)                        
-
+            search = True
             await senders.searching(websocket, formats[0])
             nb_fights += 1
     elif string_tab[1] == "deinit" and usage == 2:
@@ -177,6 +178,7 @@ async def stringing(websocket, message, usage=2):
             exit(0)
     elif "|inactive|Battle timer is ON:" in message and usage == 2 and "savereplay" not in message:
         # If previous fight has started and we can do more simultaneous fights and we're in 2nd usage.
+        # And the inactive part isn't from the replay save log
         if len(battles) < nb_fights_simu_max and nb_fights < nb_fights_max:
             if search == False:
                 search = True
@@ -205,8 +207,10 @@ async def stringing(websocket, message, usage=2):
             await senders.sender(websocket, "", "/pm " + string_tab[2] + ", Please challenge me to test your skills.")
         else:
             await senders.sender(websocket, "", "/pm " + string_tab[2] + ", Unknown command, type \".info\" for help.")
-
+            
+    elif string_tab[1] == "init":
+        search = False #Battle started        
+        #avoid "deinit" match
     if "battle" in string_tab[0]:
         # Battle concern message.
-        search = False #battle start! can search another?
         await battle_tag(websocket, message, usage)

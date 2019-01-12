@@ -28,20 +28,20 @@ def infos_for_pokemon(pkm_name):
         "baseStats": {},
         "possibleMoves": []
     }
-    with open('data/pokedex.json') as data_file:
-        pokemon = json.load(data_file)[pkm_name]
-    res["types"] = pokemon["types"]
-    res["possibleAbilities"] = list(pokemon["abilities"].values())
-    res["baseStats"] = pokemon["baseStats"]
-    with open('data/formats-data.json') as data_file:
-        try:
-            pokemon_moves = json.load(data_file)[pkm_name]["randomBattleMoves"]
-        except KeyError:
-            pokemon_moves = []
-    with open("data/moves.json") as data_file:
-        moves = json.load(data_file)
-    for move in pokemon_moves:
-        res["possibleMoves"].append(moves[move])
+    #with open('data/pokedex.json') as data_file:
+        #pokemon = json.load(data_file)[pkm_name]
+    #res["types"] = pokemon["types"]
+    #res["possibleAbilities"] = list(pokemon["abilities"].values())
+    #res["baseStats"] = pokemon["baseStats"]
+    #with open('data/formats-data.json') as data_file:
+        #try:
+            #pokemon_moves = json.load(data_file)[pkm_name]["randomBattleMoves"]
+        #except KeyError:
+            #pokemon_moves = []
+    #with open("data/moves.json") as data_file:
+        #moves = json.load(data_file)
+    #for move in pokemon_moves:
+        #res["possibleMoves"].append(moves[move])
     return res
 
 
