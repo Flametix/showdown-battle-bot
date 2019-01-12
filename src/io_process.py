@@ -5,20 +5,25 @@ from src.battlelog_parsing import battlelog_parsing
 from src.login import log_in
 from src.battle import Battle
 
+import random
+
 battles = []
 nb_fights_max = 20
 nb_fights_simu_max = 6
 nb_fights = 0
 
 formats = [
-    "gen7randombattle",
-    "gen7monotyperandombattle",
-    "gen7hackmonscup",
-    "gen7challengecup1v1",
-    "gen6battlefactory",
-    "gen7bssfactory"
+    #"gen7randombattle",
+    #"gen7monotyperandombattle",
+    #"gen7hackmonscup",
+    #"gen7challengecup1v1",
+    #"gen6battlefactory",
+    #"gen7bssfactory",
+    #"gen7randomdoublesbattle",
+    "gen7metronomebattle"
 ]
 
+team = "vacation|shaymin|weaknesspolicy|flowerveil|metronome|Relaxed|252,252,252,252,252,252|||||128]i am NOT on|shayminsky|weaknesspolicy|simple|metronome|Sassy|252,252,252,252,252,252|||||128"
 
 def check_battle(battle_list, battletag) -> Battle or None:
     """
@@ -40,6 +45,11 @@ async def battle_tag(websocket, message, usage):
     :param usage: 0: Only recieving. 1 Challenging Synedh. 2 searching random battles.
     """
     global battles
+    battleturn = -1   
+    currentturn = 1
+    good = ["not even close baby", "yes", "ez", "this is epic", "gamer", "gg"] #good lines in general (se move, crit)
+    bad = ["gameshark", "powersaves", "im calling nintendo on you", "hax", "no", "damn", "action replay"]
+    responses = ["faint", "-crit", "-supereffective"]
     lines = message.splitlines()
     battle = check_battle(battles, lines[0].split("|")[0].split(">")[1])
     for line in lines[1:]:
@@ -49,7 +59,7 @@ async def battle_tag(websocket, message, usage):
                 # Creation de la bataille
                 battle = Battle(lines[0].split("|")[0].split(">")[1])
                 battles.append(battle)
-                await senders.sendmessage(websocket, battle.battletag, "Hi")
+                await senders.sendmessage(websocket, battle.battletag, "I am a bot")
                 await senders.sendmessage(websocket, battle.battletag, "/timer on")
             elif current[1] == "player" and len(current) > 3 and current[3].lower() == "suchtestbot":
                 # Récupérer l'id joueur du bot
@@ -76,7 +86,7 @@ async def battle_tag(websocket, message, usage):
             elif current[1] == "callback" and current[2] == "trapped":
                 await battle.make_move(websocket)
             elif current[1] == "win":
-                await senders.sendmessage(websocket, battle.battletag, "wp")
+                await senders.sendmessage(websocket, battle.battletag, "g")
                 await senders.leaving(websocket, battle.battletag)
                 battles.remove(battle)
                 if usage == 2:
@@ -90,9 +100,40 @@ async def battle_tag(websocket, message, usage):
             elif current[1] == "c":
                 # This is a message
                 pass
+            
+
+                
+            
             else:
                 # Send to battlelog parser.
-                battlelog_parsing(battle, current[1:])
+                #battlelog_parsing(battle, current[1:])
+                split_line = current[1:]
+                
+                if split_line[0] in responses:
+                    if battleturn != battle.turn:
+                        if split_line[0] == "faint":
+                            await senders.sendmessage(websocket, battle.battletag, "rip")
+                            battleturn = battle.turn #1 massage per turn - Flame
+                        elif split_line[0] == "-crit":
+                            if battle.player_id in split_line[1]:
+                                await senders.sendmessage(websocket, battle.battletag, random.choice(good))
+                            else:
+                                await senders.sendmessage(websocket, battle.battletag, random.choice(bad))
+                            battleturn = battle.turn #1 massage per turn - Flame
+                        elif split_line[0] == "-supereffective":
+                            if battle.player_id in split_line[1]:
+                                await senders.sendmessage(websocket, battle.battletag, random.choice(bad))
+                            else:
+                                await senders.sendmessage(websocket, battle.battletag, random.choice(good))
+                            battleturn = battle.turn #1 massage per turn - Flame
+                        
+                        
+
+                
+                    
+
+                
+              
         except IndexError:
             pass
 
@@ -138,6 +179,8 @@ async def stringing(websocket, message, usage=0):
         try:
             if string_tab[2].split('\"')[3] != "challengeTo":
                 if string_tab[2].split('\"')[5] in formats:
+                    if string_tab[2].split('\"')[5] == "gen7metronomebattle":
+                        await senders.sender(websocket, "", "/utm " + team)                        
                     await senders.sender(websocket, "", "/accept " + string_tab[2].split('\"')[3])
                 else:
                     await senders.sender(websocket, "", "/reject " + string_tab[2].split('\"')[3])

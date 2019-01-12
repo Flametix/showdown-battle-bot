@@ -32,26 +32,34 @@ def minor_actions(battle: Battle, split_line):
         pass
     elif split_line[0] == "-status":
         if battle.player_id in split_line[1]:
-            battle.update_status(battle.bot_team.active(), split_line[2])
+            pass
+            #battle.update_status(battle.bot_team.active(), split_line[2])
         else:
-            battle.update_status(battle.enemy_team.active(), split_line[2])
+            pass
+            #battle.update_status(battle.enemy_team.active(), split_line[2])
     elif split_line[0] == "-curestatus":
         if battle.player_id in split_line[1]:
-            battle.update_status(battle.bot_team.active())
+            pass
+            #battle.update_status(battle.bot_team.active())
         else:
-            battle.update_status(battle.enemy_team.active())
+            pass
+            #battle.update_status(battle.enemy_team.active())
     elif split_line[0] == "-cureteam":
         pass
     elif split_line[0] == "-boost":
         if battle.player_id in split_line[1]:
-            battle.set_buff(battle.bot_team.active(), split_line[2], int(split_line[3]))
+            #battle.set_buff(battle.bot_team.active(), split_line[2], int(split_line[3]))
+            pass
         else:
-            battle.set_buff(battle.enemy_team.active(), split_line[2], int(split_line[3]))
+            pass
+            #battle.set_buff(battle.enemy_team.active(), split_line[2], int(split_line[3]))
     elif split_line[0] == "-unboost":
         if battle.player_id in split_line[1]:
-            battle.set_buff(battle.bot_team.active(), split_line[2], - int(split_line[3]))
+            pass
+            #battle.set_buff(battle.bot_team.active(), split_line[2], - int(split_line[3]))
         else:
-            battle.set_buff(battle.enemy_team.active(), split_line[2], - int(split_line[3]))
+            pass
+            #battle.set_buff(battle.enemy_team.active(), split_line[2], - int(split_line[3]))
     elif split_line[0] == "-weather":
         pass
     elif split_line[0] == "-fieldstart":
@@ -76,14 +84,18 @@ def minor_actions(battle: Battle, split_line):
         pass
     elif split_line[0] == "-item":
         if battle.player_id in split_line[1]:
-            battle.bot_team.active().item = split_line[2].lower().replace(" ", "")
+            pass
+            #battle.bot_team.active().item = split_line[2].lower().replace(" ", "")
         else:
-            battle.enemy_team.active().item = split_line[2].lower().replace(" ", "")
+            pass
+            #battle.enemy_team.active().item = split_line[2].lower().replace(" ", "")
     elif split_line[0] == "-enditem":
         if battle.player_id not in split_line[1]:
-            battle.bot_team.active().item = None
+            pass
+            #battle.bot_team.active().item = None
         else:
-            battle.enemy_team.active().item = None
+            pass
+            #battle.enemy_team.active().item = None
     elif split_line[0] == "-ability":
         pass
     elif split_line[0] == "-endability":

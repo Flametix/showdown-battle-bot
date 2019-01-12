@@ -157,8 +157,11 @@ class Battle:
         Launch best action chooser and call corresponding functions.
         :param websocket: Websocket stream.
         """
-        action = make_best_action(self)
-        if action[0] == "move":
-            await self.make_move(websocket, action[1:])
-        if action[0] == "switch":
-            await self.make_switch(websocket, action[1])
+        #action = make_best_action(self)
+        #if action[0] == "move":
+            #await self.make_move(websocket, action[1:])
+        #if action[0] == "switch":
+            #await self.make_switch(websocket, action[1])
+            
+        #metronome
+        await senders.sendmessage(websocket, self.battletag, "/choose default")
