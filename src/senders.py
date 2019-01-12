@@ -66,3 +66,11 @@ async def leaving(websocket, battletag):
     :param battletag: Battletag string.
     """
     await sender(websocket, "", "/leave " + battletag)
+
+async def savereplay(websocket, battletag):
+    """
+    Format savereplay websocket, call sender function.
+    :param websocket: Websocket stream.
+    :param battletag: Battletag string.
+    """
+    await sender(websocket, battletag, "/savereplay")

@@ -8,8 +8,8 @@ from src.battle import Battle
 import random
 
 battles = []
-nb_fights_max = 20
-nb_fights_simu_max = 6
+nb_fights_max = 1 #Maximum fights that can be searched at the same time - leave at 1 for easy closing
+nb_fights_simu_max = 1 #Something for ai
 nb_fights = 0
 
 formats = [
@@ -47,8 +47,8 @@ async def battle_tag(websocket, message, usage):
     global battles
     battleturn = -1   
     currentturn = 1
-    good = ["not even close baby", "yes", "ez", "this is epic", "gamer", "gg"] #good lines in general (se move, crit)
-    bad = ["gameshark", "powersaves", "im calling nintendo on you", "hax", "no", "damn", "action replay"]
+    good = ["not even close baby", "yes", "ez", "this is epic", "gg", "nice"] #good lines in general (se move, crit)
+    bad = ["gameshark", "powersaves", "calling nintendo on you rn", "hax", "no", "damn", "action replay", "sheesh", "eh"]
     responses = ["faint", "-crit", "-supereffective"]
     lines = message.splitlines()
     battle = check_battle(battles, lines[0].split("|")[0].split(">")[1])
@@ -59,9 +59,9 @@ async def battle_tag(websocket, message, usage):
                 # Creation de la bataille
                 battle = Battle(lines[0].split("|")[0].split(">")[1])
                 battles.append(battle)
-                await senders.sendmessage(websocket, battle.battletag, "I am a bot")
+                await senders.sendmessage(websocket, battle.battletag, "I am a bot. Good luck have fun")
                 await senders.sendmessage(websocket, battle.battletag, "/timer on")
-            elif current[1] == "player" and len(current) > 3 and current[3].lower() == "suchtestbot":
+            elif current[1] == "player" and len(current) > 3 and current[3].lower() == "flame20xx":
                 # Récupérer l'id joueur du bot
                 battle.player_id = current[2]
                 battle.turn += int(current[2].split('p')[1]) - 1
@@ -86,14 +86,15 @@ async def battle_tag(websocket, message, usage):
             elif current[1] == "callback" and current[2] == "trapped":
                 await battle.make_move(websocket)
             elif current[1] == "win":
-                await senders.sendmessage(websocket, battle.battletag, "g")
+                await senders.sendmessage(websocket, battle.battletag, "Good game!") #friendly
+                await senders.savereplay(websocket, battle.battletag)                
                 await senders.leaving(websocket, battle.battletag)
                 battles.remove(battle)
                 if usage == 2:
                     with open("log.txt", "r+") as file:
                         line = file.read().split('/')
                         file.seek(0)
-                        if "suchtestbot" in current[2].lower():
+                        if "flame20xx" in current[2].lower():
                             file.write(str(int(line[0]) + 1) + "/" + line[1] + "/" + str(int(line[2]) + 1))
                         else:
                             file.write(line[0] + "/" + str(int(line[1]) + 1) + "/" + str(int(line[2]) + 1))
@@ -137,7 +138,7 @@ async def battle_tag(websocket, message, usage):
         except IndexError:
             pass
 
-async def stringing(websocket, message, usage=0):
+async def stringing(websocket, message, usage=2):
     """
     First filtering function on received messages.
     Handle challenge and research actions.
@@ -155,16 +156,20 @@ async def stringing(websocket, message, usage=0):
     if string_tab[1] == "challstr":
         # If we got the challstr, we now can log in.
         await log_in(websocket, string_tab[2], string_tab[3])
-    elif string_tab[1] == "updateuser" and string_tab[2] == "SuchTestBot":
+    elif string_tab[1] == "updateuser" and string_tab[2] == "Flame20XX": #replace with your bot name I guess
         # Once we are connected.
         if usage == 1:
-            await senders.challenge(websocket, "Synedh", formats[0])
+            await senders.challenge(websocket, "Flametix", formats[0])
         if usage == 2:
+            await senders.sender(websocket, "", "/utm " + team)                        
+
             await senders.searching(websocket, formats[0])
             nb_fights += 1
     elif string_tab[1] == "deinit" and usage == 2:
         # If previous fight is over and we're in 2nd usage
         if nb_fights < nb_fights_max:  # If it remains fights
+            await senders.sender(websocket, "", "/utm " + team)                        
+
             await senders.searching(websocket, formats[0])
             nb_fights += 1
         elif nb_fights >= nb_fights_max and len(battles) == 0:  # If it don't remains fights
@@ -172,6 +177,7 @@ async def stringing(websocket, message, usage=0):
     elif "|inactive|Battle timer is ON:" in message and usage == 2:
         # If previous fight has started and we can do more simultaneous fights and we're in 2nd usage.
         if len(battles) < nb_fights_simu_max and nb_fights < nb_fights_max:
+            await senders.sender(websocket, "", "/utm " + team)                        
             await senders.searching(websocket, formats[0])
             nb_fights += 1
     elif "updatechallenges" in string_tab[1]:
@@ -185,10 +191,10 @@ async def stringing(websocket, message, usage=0):
                 else:
                     await senders.sender(websocket, "", "/reject " + string_tab[2].split('\"')[3])
                     await senders.sender(websocket, "", "/pm " + string_tab[2].split('\"')[3]
-                                         + ", Sorry, I accept only solo randomized metas.")
+                                         + ", Sorry, I accept only Metronome Battle.")
         except KeyError:
             pass
-    elif string_tab[1] == "pm" and "SuchTestBot" not in string_tab[2]:
+    elif string_tab[1] == "pm" and "Flame20XX" not in string_tab[2]:
         if string_tab[4] == ".info":
             await senders.sender(websocket, "", "/pm " + string_tab[2] + ", Showdown Battle Bot. Active for "
                                                                        + ", ".join(formats[:-1]) + " and "
