@@ -45,3 +45,5 @@ See [data](data/) forlder for more informations.
 Bot's brain, the AI:
 
 (I forked this bot and destroyed its ai. Whenever it makes a move it says "/choose default". This lets it play doubles when it couldn't before.)
+
+NOTE: This means it cannot manually mega, dynamax, z-move or make any real decisions and is worse than a real player in that sense.
